@@ -44,7 +44,8 @@
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
-uint8_t flag = 0;
+uint8_t flag = 0; //SW Interrupt Flag
+uint8_t rx_data; //Rx Buffer
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -89,6 +90,8 @@ int main(void)
   MX_USART3_UART_Init();
   /* USER CODE BEGIN 2 */
   uint8_t str[] = "Hellow, World!\n\r";
+
+  HAL_UART_Receive_IT(&huart3, &rx_data, 1);
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -107,8 +110,8 @@ int main(void)
 	  }
 
 	  //UART
-	  HAL_UART_Transmit_IT(&huart3, str, sizeof(str));
-	  HAL_Delay(1000);
+	  //HAL_UART_Transmit_IT(&huart3, str, sizeof(str));
+	  //HAL_Delay(1000);
 
     /* USER CODE END WHILE */
 
@@ -157,11 +160,29 @@ void SystemClock_Config(void)
 }
 
 /* USER CODE BEGIN 4 */
+//SW Interrupt CallBack Function
 HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
 	if(GPIO_Pin == GPIO_PIN_1) {
 		flag = 1;
 	} else if(GPIO_Pin == GPIO_PIN_0) {
 		flag = 0;
+	}
+}
+
+//UART Callback Function
+void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart) {
+	if(huart -> Instance == USART3) {
+		//Data 1byte 수신 후 Interrupt 발생
+//		HAL_UART_Receive_IT(&huart3, &rx_data, 1);
+
+
+		//Receive Data Transmit
+		HAL_UART_Transmit(&huart3, &rx_data, 1, 10);
+		rx_data = 0;
+		Green_LED_Toggle;
+		HAL_Delay(1000);
+
+		HAL_UART_Receive_IT(&huart3, &rx_data, 1);
 	}
 }
 /* USER CODE END 4 */
