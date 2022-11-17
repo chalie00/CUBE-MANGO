@@ -88,7 +88,7 @@ int main(void)
   MX_GPIO_Init();
   MX_USART3_UART_Init();
   /* USER CODE BEGIN 2 */
-
+  uint8_t str[] = "Hellow, World!\n\r";
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -105,6 +105,10 @@ int main(void)
 		  Red_LED_Toggle;
 		  HAL_Delay(1000);
 	  }
+
+	  //UART
+	  HAL_UART_Transmit_IT(&huart3, str, sizeof(str));
+	  HAL_Delay(1000);
 
     /* USER CODE END WHILE */
 
