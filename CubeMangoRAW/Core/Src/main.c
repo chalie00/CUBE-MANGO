@@ -18,13 +18,13 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
+#include "tim.h"
 #include "usart.h"
 #include "gpio.h"
-#include "Define.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-
+#include "Define.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -46,6 +46,7 @@
 /* USER CODE BEGIN PV */
 uint8_t flag = 0; //SW Interrupt Flag
 uint8_t rx_data; //Rx Buffer
+uint8_t led_Flag = 0; //LED Toggle Flag
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -88,8 +89,9 @@ int main(void)
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
   MX_USART3_UART_Init();
+  MX_TIM4_Init();
   /* USER CODE BEGIN 2 */
-  uint8_t str[] = "Hellow, World!\n\r";
+  HAL_TIM_Base_Start_IT(&htim4);
 
   HAL_UART_Receive_IT(&huart3, &rx_data, 1);
   /* USER CODE END 2 */
@@ -99,13 +101,22 @@ int main(void)
   while (1)
   {
 	  All_LED_Off;
-	  if(flag == 1) {
+//	  if(flag == 1) {
+//		  HAL_Delay(1000);
+//		  Green_LED_Toggle;
+//		  HAL_Delay(1000);
+//	  }else if(flag == 0) {
+//		  HAL_Delay(1000);
+//		  Red_LED_Toggle;
+//		  HAL_Delay(1000);
+//	  }
+
+	  //timer
+	  if(led_Flag == 1) {
+		  Green_LED_On;
 		  HAL_Delay(1000);
-		  Green_LED_Toggle;
-		  HAL_Delay(1000);
-	  }else if(flag == 0) {
-		  HAL_Delay(1000);
-		  Red_LED_Toggle;
+	  } else if(led_Flag == 0) {
+		  Green_LED_Off;
 		  HAL_Delay(1000);
 	  }
 
@@ -161,30 +172,38 @@ void SystemClock_Config(void)
 
 /* USER CODE BEGIN 4 */
 //SW Interrupt CallBack Function
-HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
-	if(GPIO_Pin == GPIO_PIN_1) {
-		flag = 1;
-	} else if(GPIO_Pin == GPIO_PIN_0) {
-		flag = 0;
-	}
-}
+//HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
+//	if(GPIO_Pin == GPIO_PIN_1) {
+//		flag = 1;
+//	} else if(GPIO_Pin == GPIO_PIN_0) {
+//		flag = 0;
+//	}
+//}
 
 //UART Callback Function
-void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart) {
-	if(huart -> Instance == USART3) {
-		//Data 1byte 수신 후 Interrupt 발생
+//void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart) {
+//	if(huart -> Instance == USART3) {
+//		//Data 1byte ?��?�� ?�� Interrupt 발생
+////		HAL_UART_Receive_IT(&huart3, &rx_data, 1);
+//
+//
+//		//Receive Data Transmit
+//		HAL_UART_Transmit(&huart3, &rx_data, 1, 10);
+//		rx_data = 0;
+//		Green_LED_Toggle;
+//		HAL_Delay(1000);
+//
 //		HAL_UART_Receive_IT(&huart3, &rx_data, 1);
+//	}
+//}
 
-
-		//Receive Data Transmit
-		HAL_UART_Transmit(&huart3, &rx_data, 1, 10);
-		rx_data = 0;
-		Green_LED_Toggle;
-		HAL_Delay(1000);
-
-		HAL_UART_Receive_IT(&huart3, &rx_data, 1);
+//Timer 4 Callback Function
+void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
+	if(htim -> Instance == TIM4) {
+		led_Flag ^= 0x01;
 	}
 }
+
 /* USER CODE END 4 */
 
 /**
