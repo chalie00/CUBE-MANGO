@@ -21,6 +21,7 @@
 #include "usart.h"
 #include "gpio.h"
 
+
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "Define.h"
@@ -53,6 +54,7 @@ float f = 1.234; //test for printf
 
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
+
 /* USER CODE BEGIN PFP */
 int_write(int file, char *p, int len) {
 	//Parameter: output uart, output char, output length, timeout)
